@@ -2,9 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/vzhurin/template/internal/task/application"
 	"github.com/vzhurin/template/internal/task/application/query"
+	"io"
 	"net/http"
 )
 
@@ -23,7 +25,17 @@ func (s *Server) EstimateTask(w http.ResponseWriter, r *http.Request, taskID UUI
 }
 
 func (s *Server) CreateTask(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		// TODO
+	}
 
+	task := &PostTask{}
+	if err := json.Unmarshal(body, task); err != nil {
+		// TODO
+	}
+
+	fmt.Printf("%#v", task)
 }
 
 func (s *Server) GetTask(w http.ResponseWriter, r *http.Request, taskID UUID) {
