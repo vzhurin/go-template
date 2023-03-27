@@ -1,0 +1,1 @@
+FROM goland:1.20.2-alpine3.1 as base

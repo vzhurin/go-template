@@ -1,0 +1,292 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Task tracker
+  description: Task tracker
+servers:
+  - url: https://{hostname}:{port}/api
+    variables:
+      hostname:
+        default: localhost
+      port:
+        default: "5000"
+security:
+  - bearerAuth: []
+paths:
+  /tasks/{taskID}:
+    get:
+      operationId: getTask
+      parameters:
+        - in: path
+          name: taskID
+          schema:
+            $ref: "#/components/schemas/UUID"
+          required: true
+      responses:
+        "200":
+          description: Task
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Task"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    put:
+      operationId: updateTask
+      parameters:
+        - in: path
+          name: taskID
+          schema:
+            $ref: "#/components/schemas/UUID"
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostTask"
+      responses:
+        "204":
+          description: "Task updated"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /task/{taskID}/estimate:
+    put:
+      operationId: estimateTask
+      parameters:
+        - in: path
+          name: taskID
+          schema:
+            $ref: "#/components/schemas/UUID"
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - estimation
+              properties:
+                estimation:
+                  $ref: "#/components/schemas/TaskEstimation"
+      responses:
+        "204":
+          description: "Task estimated"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tasks/{taskID}/transitStatus:
+    put:
+      operationId:  transitTaskStatus
+      parameters:
+        - in: path
+          name: taskID
+          schema:
+            $ref: "#/components/schemas/UUID"
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  $ref: "#/components/schemas/TaskStatus"
+      responses:
+        "204":
+          description: "Transition completed"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tasks/{taskID}/assignParticipant:
+    put:
+      operationId: assignParticipantToTask
+      parameters:
+        - in: path
+          name: taskID
+          schema:
+            $ref: "#/components/schemas/UUID"
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - participantID
+              properties:
+                participantID:
+                  $ref: "#/components/schemas/ParticipantID"
+      responses:
+        "204":
+          description: "Participant assigned"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tasks:
+    post:
+      operationId: createTask
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostTask"
+      responses:
+        "201":
+          description: "Task created"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    UUID:
+      type: string
+      format: uuid
+
+    ParticipantID:
+      type: string
+      format: uuid
+      
+    TaskStatus:
+      type: string
+      enum:
+        - unscheduled
+        - ready_for_development
+        - in_development
+        - ready_for_review
+        - in_review
+        - ready_for_deploy
+        - completed
+
+    TaskEstimation:
+      type: integer
+      format: uint64
+
+    Task:
+      allOf:
+        - type: object
+          required:
+            - id
+            - status
+            - assignee
+            - estimation
+          properties:
+            id:
+              $ref: "#/components/schemas/UUID"
+            status:
+              $ref: "#/components/schemas/TaskStatus"
+            assignee:
+              $ref: "#/components/schemas/ParticipantID"
+            estimation:
+              $ref: "#/components/schemas/TaskEstimation"
+        - $ref: "#/components/schemas/PostTask"
+
+    PostTask:
+      type: object
+      required:
+        - title
+        - description
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
