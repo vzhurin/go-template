@@ -11,9 +11,13 @@ type GetTask struct {
 
 type GetTaskHandler struct{}
 
-func (h *GetTaskHandler) Handle(ctx context.Context, query GetTask) (Task, error) {
+func NewGetTaskHandler() *GetTaskHandler {
 	// TODO repository
 
+	return &GetTaskHandler{}
+}
+
+func (h *GetTaskHandler) Handle(ctx context.Context, query GetTask) (Task, error) {
 	return Task{
 		ID:          uuid.Nil,
 		Title:       "title",

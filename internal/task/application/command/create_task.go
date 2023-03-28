@@ -7,7 +7,12 @@ type CreateTask struct {
 }
 
 type CreateTaskHandler struct {
+}
+
+func NewCreateTaskHandler() *CreateTaskHandler {
 	// TODO repository
+
+	return &CreateTaskHandler{}
 }
 
 func (h *CreateTaskHandler) Handle(ctx context.Context, cmd CreateTask) error {
