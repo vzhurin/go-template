@@ -17,15 +17,15 @@ type logFormatter struct {
 }
 
 func (l *logFormatter) NewLogEntry(r *http.Request) middleware.LogEntry {
-	logFields := logrus.Fields{}
+	logFields := logrus.Fields{
+		"http_method": r.Method,
+		"remote_addr": r.RemoteAddr,
+		"uri":         r.RequestURI,
+	}
 
 	if reqID := middleware.GetReqID(r.Context()); reqID != "" {
 		logFields["req_id"] = reqID
 	}
-
-	logFields["http_method"] = r.Method
-	logFields["remote_addr"] = r.RemoteAddr
-	logFields["uri"] = r.RequestURI
 
 	entry := &logEntry{
 		logger: l.logger.WithFields(logFields),
@@ -41,13 +41,13 @@ type logEntry struct {
 }
 
 func (l *logEntry) Write(status, bytes int, header http.Header, elapsed time.Duration, extra interface{}) {
-	l.logger = l.logger.WithFields(logrus.Fields{
+	logger := l.logger.WithFields(logrus.Fields{
 		"resp_status":       status,
 		"resp_bytes_length": bytes,
 		"resp_elapsed":      elapsed.Round(time.Millisecond / 100).String(),
 	})
 
-	l.logger.Info("Request completed")
+	logger.Info("Request completed")
 }
 
 func (l *logEntry) Panic(v interface{}, stack []byte) {
