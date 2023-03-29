@@ -2,10 +2,10 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/google/uuid"
-	"github.com/vzhurin/template/internal/task/application"
-	"github.com/vzhurin/template/internal/task/application/query"
+	"github.com/vzhurin/template/internal/task_tracker/application"
+	"github.com/vzhurin/template/internal/task_tracker/application/command"
+	"github.com/vzhurin/template/internal/task_tracker/application/query"
 	"io"
 	"net/http"
 )
@@ -35,7 +35,16 @@ func (s *Server) CreateTask(w http.ResponseWriter, r *http.Request) {
 		// TODO
 	}
 
-	fmt.Printf("%#v", task)
+	cmd := command.CreateTask{
+		Title:       task.Title,
+		Description: task.Description,
+	}
+
+	err = s.app.Commands.CreateTask.Handle(r.Context(), cmd)
+	if err != nil {
+		// TODO
+	}
+
 }
 
 func (s *Server) GetTask(w http.ResponseWriter, r *http.Request, taskID UUID) {

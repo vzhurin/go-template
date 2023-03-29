@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"github.com/sirupsen/logrus"
-	"github.com/vzhurin/template/internal/task/application"
-	"github.com/vzhurin/template/internal/task/infrastructure/http/api"
+	"github.com/vzhurin/template/internal/task_tracker/application"
+	"github.com/vzhurin/template/internal/task_tracker/infrastructure/http/api"
+	"github.com/vzhurin/template/internal/task_tracker/infrastructure/persistance"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,13 +22,14 @@ func main() {
 	l.SetFormatter(&logrus.JSONFormatter{})
 	logger := l.WithField("app", AppName)
 
-	app, cleanup := application.NewApplication(logger)
+	taskRepository := persistance.NewInMemoryTaskRepository()
+	app, cleanup := application.NewApplication(taskRepository, logger)
 	defer cleanup()
 	server := api.NewServer(app)
-	router := api.NewRouter(server)
+	handler := api.NewHandler(server, logger)
 	httpServer := &http.Server{
 		Addr:    ":5000",
-		Handler: router,
+		Handler: handler,
 	}
 
 	done := make(chan os.Signal, 1)

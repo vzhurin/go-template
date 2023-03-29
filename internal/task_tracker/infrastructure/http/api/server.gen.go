@@ -15,7 +15,7 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (PUT /task/{taskID}/estimate)
+	// (PUT /task_tracker/{taskID}/estimate)
 	EstimateTask(w http.ResponseWriter, r *http.Request, taskID UUID)
 
 	// (POST /tasks)
@@ -314,7 +314,7 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/task/{taskID}/estimate", wrapper.EstimateTask)
+		r.Put(options.BaseURL+"/task_tracker/{taskID}/estimate", wrapper.EstimateTask)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/tasks", wrapper.CreateTask)
