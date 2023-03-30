@@ -2,7 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
+	ht "github.com/vzhurin/template/internal/common/infrastructure/http"
 	"github.com/vzhurin/template/internal/task_tracker/application"
 	"github.com/vzhurin/template/internal/task_tracker/application/command"
 	"github.com/vzhurin/template/internal/task_tracker/application/query"
@@ -11,12 +12,14 @@ import (
 )
 
 type Server struct {
-	app *application.Application
+	app    *application.Application
+	logger logrus.FieldLogger
 }
 
-func NewServer(app *application.Application) *Server {
+func NewServer(app *application.Application, logger logrus.FieldLogger) *Server {
 	return &Server{
-		app: app,
+		app:    app,
+		logger: logger,
 	}
 }
 
@@ -48,9 +51,11 @@ func (s *Server) CreateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) GetTask(w http.ResponseWriter, r *http.Request, taskID UUID) {
-	task, err := s.app.Queries.GetTask.Handle(r.Context(), query.GetTask{ID: uuid.Nil})
+	task, err := s.app.Queries.TaskByID.Handle(r.Context(), query.TaskByID{ID: taskID})
 	if err != nil {
-		// TODO
+		s.logger.WithError(err).Warning("task not found")
+		ht.NotFound(err.Error(), w, r)
+		return
 	}
 
 	payload, err := json.Marshal(Task{
@@ -63,13 +68,18 @@ func (s *Server) GetTask(w http.ResponseWriter, r *http.Request, taskID UUID) {
 	})
 
 	if err != nil {
-		// TODO
+		s.logger.WithError(err).Error("marshaling failed")
+		ht.InternalError(err.Error(), w, r)
+
+		return
 	}
 
 	_, err = w.Write(payload)
 
 	if err != nil {
-		// TODO
+		s.logger.WithError(err).Error("response failed")
+		ht.InternalError(err.Error(), w, r)
+		return
 	}
 }
 

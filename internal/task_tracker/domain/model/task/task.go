@@ -34,8 +34,33 @@ func NewTask(id ID, title Title, description Description) *Task {
 	}
 }
 
+func UnmarshalFromDatabase(
+	id string,
+	title string,
+	description string,
+	assignee string,
+	status string,
+	estimation uint64,
+) *Task {
+	i, _ := NewID(id)
+	t, _ := NewTitle(title)
+	d, _ := NewDescription(description)
+	a, _ := NewAssignee(assignee)
+	s := Status{status: status}
+	e := NewEstimation(estimation)
+
+	return &Task{
+		id:          i,
+		title:       t,
+		description: d,
+		assignee:    a,
+		status:      s,
+		estimation:  e,
+	}
+}
+
 func (t *Task) ID() ID {
-	return t.ID()
+	return t.id
 }
 
 func (t *Task) Describe(title Title, description Description) {
@@ -68,4 +93,17 @@ func (t *Task) Estimate(estimation Estimation) {
 	t.estimation = estimation
 
 	// TODO domain event
+}
+
+func (t *Task) MarshalToDatabase() map[string]interface{} {
+	m := make(map[string]interface{})
+
+	m["id"] = t.ID().String()
+	m["title"] = t.title.String()
+	m["description"] = t.description.String()
+	m["assignee"] = t.assignee.String()
+	m["status"] = t.status.String()
+	m["estimation"] = t.estimation.estimation
+
+	return m
 }

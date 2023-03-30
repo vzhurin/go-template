@@ -13,13 +13,17 @@ type Application struct {
 	Queries  Queries
 }
 
-func NewApplication(taskRepository task.Repository, logger logrus.FieldLogger) (*Application, func()) {
+func NewApplication(
+	taskRepository task.Repository,
+	taskByIDReadModel query.TaskByIDReadModel,
+	logger logrus.FieldLogger,
+) (*Application, func()) {
 	return &Application{
 			Commands: Commands{
 				CreateTask: application.NewCommandLoggingDecorator[command.CreateTask](command.NewCreateTaskHandler(taskRepository), logger),
 			},
 			Queries: Queries{
-				GetTask: application.NewQueryLoggingDecorator[query.GetTask, query.Task](query.NewGetTaskHandler(), logger),
+				TaskByID: application.NewQueryLoggingDecorator[query.TaskByID, *query.Task](query.NewTaskByIDHandler(taskByIDReadModel), logger),
 			},
 		},
 		func() { /* TODO add cleanup */ }
@@ -30,5 +34,5 @@ type Commands struct {
 }
 
 type Queries struct {
-	GetTask application.QueryHandler[query.GetTask, query.Task]
+	TaskByID application.QueryHandler[query.TaskByID, *query.Task]
 }

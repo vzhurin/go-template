@@ -23,9 +23,9 @@ func main() {
 	logger := l.WithField("app", AppName)
 
 	taskRepository := persistance.NewInMemoryTaskRepository()
-	app, cleanup := application.NewApplication(taskRepository, logger)
+	app, cleanup := application.NewApplication(taskRepository, taskRepository, logger)
 	defer cleanup()
-	server := api.NewServer(app)
+	server := api.NewServer(app, logger)
 	handler := api.NewHandler(server, logger)
 	httpServer := &http.Server{
 		Addr:    ":5000",
