@@ -2,10 +2,11 @@ package http
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
+
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/sirupsen/logrus"
 )
 
 func NewLoggingMiddleware(logger logrus.FieldLogger) func(next http.Handler) http.Handler {

@@ -3,8 +3,9 @@ package application
 import (
 	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type commandLoggingDecorator[C any] struct {

@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	"github.com/vzhurin/template/internal/common/application"
 )

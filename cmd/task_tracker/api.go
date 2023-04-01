@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
-	"github.com/vzhurin/template/internal/task_tracker/application"
-	"github.com/vzhurin/template/internal/task_tracker/infrastructure/http/api"
-	"github.com/vzhurin/template/internal/task_tracker/infrastructure/persistance"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/vzhurin/template/internal/task_tracker/application"
+	"github.com/vzhurin/template/internal/task_tracker/infrastructure/http/api"
+	"github.com/vzhurin/template/internal/task_tracker/infrastructure/persistance"
 )
 
 const (

@@ -1,11 +1,12 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/sirupsen/logrus"
 	common "github.com/vzhurin/template/internal/common/infrastructure/http"
-	"net/http"
 )
 
 func NewHandler(server ServerInterface, logger logrus.FieldLogger) http.Handler {

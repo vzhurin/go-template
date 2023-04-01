@@ -2,13 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"io"
+	"net/http"
+
 	"github.com/sirupsen/logrus"
 	ht "github.com/vzhurin/template/internal/common/infrastructure/http"
 	"github.com/vzhurin/template/internal/task_tracker/application"
 	"github.com/vzhurin/template/internal/task_tracker/application/command"
 	"github.com/vzhurin/template/internal/task_tracker/application/query"
-	"io"
-	"net/http"
 )
 
 type Server struct {
@@ -30,12 +31,12 @@ func (s *Server) EstimateTask(w http.ResponseWriter, r *http.Request, taskID UUI
 func (s *Server) CreateTask(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		// TODO
+		ht.InternalError(err.Error(), w, r)
 	}
 
 	task := &PostTask{}
 	if err := json.Unmarshal(body, task); err != nil {
-		// TODO
+		ht.BadRequest(err.Error(), w, r)
 	}
 
 	cmd := command.CreateTask{
@@ -45,7 +46,7 @@ func (s *Server) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	err = s.app.Commands.CreateTask.Handle(r.Context(), cmd)
 	if err != nil {
-		// TODO
+		ht.BadRequest(err.Error(), w, r)
 	}
 
 }

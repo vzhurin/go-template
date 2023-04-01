@@ -1,0 +1,14 @@
+run:
+  skip-files:
+    - ".*\\.gen\\.go$"
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - goimports
