@@ -81,11 +81,11 @@ func (t *Task) SwitchStatus(status Status) error {
 	for _, s := range statusTransitions[t.status] {
 		if s == status {
 			t.status = status
+			t.events = append(t.events, event.NewStatusSwitched(uuid.New(), time.Now(), t.id, status))
+
 			return nil
 		}
 	}
-
-	t.events = append(t.events, event.NewStatusSwitched(uuid.New(), time.Now(), t.id, status))
 
 	return fmt.Errorf("invalid transition: %s -> %s", t.status, status)
 }
