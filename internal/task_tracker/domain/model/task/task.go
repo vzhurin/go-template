@@ -37,31 +37,6 @@ func NewTask(id ID, title Title, description Description) *Task {
 	}
 }
 
-func UnmarshalFromDatabase(
-	id string,
-	title string,
-	description string,
-	assignee string,
-	status string,
-	estimation uint64,
-) *Task {
-	i, _ := NewID(id)
-	t, _ := NewTitle(title)
-	d, _ := NewDescription(description)
-	a, _ := NewAssignee(assignee)
-	s := Status{status: status}
-	e := NewEstimation(estimation)
-
-	return &Task{
-		id:          i,
-		title:       t,
-		description: d,
-		assignee:    a,
-		status:      s,
-		estimation:  e,
-	}
-}
-
 func (t *Task) ID() ID {
 	return t.id
 }
@@ -93,6 +68,31 @@ func (t *Task) SwitchStatus(status Status) error {
 func (t *Task) Estimate(estimation Estimation) {
 	t.estimation = estimation
 	t.events = append(t.events, event.NewEstimated(uuid.New(), time.Now(), t.id, estimation))
+}
+
+func UnmarshalFromDatabase(
+	id string,
+	title string,
+	description string,
+	assignee string,
+	status string,
+	estimation uint64,
+) *Task {
+	i, _ := NewID(id)
+	t, _ := NewTitle(title)
+	d, _ := NewDescription(description)
+	a, _ := NewAssignee(assignee)
+	s := Status{status: status}
+	e := NewEstimation(estimation)
+
+	return &Task{
+		id:          i,
+		title:       t,
+		description: d,
+		assignee:    a,
+		status:      s,
+		estimation:  e,
+	}
 }
 
 func (t *Task) MarshalToDatabase() map[string]interface{} {

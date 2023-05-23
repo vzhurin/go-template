@@ -77,7 +77,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /task/{taskID}/estimate:
+  /tasks/{taskID}/estimate:
     put:
       operationId: estimateTask
       parameters:

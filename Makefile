@@ -1,17 +1,16 @@
-# TODO build
-
 default: build
 
 HASH := $(shell git rev-parse --short=10 HEAD)
 
-.PHONY: build
-build:
-	echo "build"
+.PHONY: build-api
+build-api:
+	docker build -t task-tracker/api:$(HASH) -f ./build/package/Dockerfile.api --target release .
+	docker tag task-tracker/api:$(HASH) task-tracker/api:latest
 
 .PHONY: openapi
 openapi:
-	go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 -generate types -o internal/task/infrastructure/http/api/types.gen.go -package api api/openapi/task.yaml
-	go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 -generate chi-server -o internal/task/infrastructure/http/api/server.gen.go -package api api/openapi/task.yaml
+	go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 -generate types -o internal/task_tracker/infrastructure/http/api/types.gen.go -package api api/openapi/task_tracker.yaml
+	go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 -generate chi-server -o internal/task_tracker/infrastructure/http/api/server.gen.go -package api api/openapi/task_tracker.yaml
 
 .PHONY: lint
 lint:
