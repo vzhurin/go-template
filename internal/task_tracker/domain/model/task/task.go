@@ -2,9 +2,9 @@ package task
 
 import (
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/vzhurin/template/internal/task_tracker/domain/model/task/event"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var statusTransitions = map[Status][]Status{
@@ -24,7 +24,7 @@ type Task struct {
 	assignee    Assignee
 	status      Status
 	estimation  Estimation
-	events      []event.Event
+	events      []Event
 }
 
 func NewTask(id ID, title Title, description Description) *Task {
@@ -33,7 +33,7 @@ func NewTask(id ID, title Title, description Description) *Task {
 		title:       title,
 		description: description,
 		status:      Unscheduled,
-		events:      []event.Event{event.NewCreated(uuid.New(), time.Now(), id, title, description)},
+		events:      []Event{NewCreated(uuid.New(), time.Now(), id, title, description)},
 	}
 }
 
@@ -44,19 +44,19 @@ func (t *Task) ID() ID {
 func (t *Task) Describe(title Title, description Description) {
 	t.title = title
 	t.description = description
-	t.events = append(t.events, event.NewDescribed(uuid.New(), time.Now(), t.id, title, description))
+	t.events = append(t.events, NewDescribed(uuid.New(), time.Now(), t.id, title, description))
 }
 
 func (t *Task) Assign(assignee Assignee) {
 	t.assignee = assignee
-	t.events = append(t.events, event.NewAssigned(uuid.New(), time.Now(), t.id, assignee))
+	t.events = append(t.events, NewAssigned(uuid.New(), time.Now(), t.id, assignee))
 }
 
 func (t *Task) SwitchStatus(status Status) error {
 	for _, s := range statusTransitions[t.status] {
 		if s == status {
 			t.status = status
-			t.events = append(t.events, event.NewStatusSwitched(uuid.New(), time.Now(), t.id, status))
+			t.events = append(t.events, NewStatusSwitched(uuid.New(), time.Now(), t.id, status))
 
 			return nil
 		}
@@ -67,7 +67,7 @@ func (t *Task) SwitchStatus(status Status) error {
 
 func (t *Task) Estimate(estimation Estimation) {
 	t.estimation = estimation
-	t.events = append(t.events, event.NewEstimated(uuid.New(), time.Now(), t.id, estimation))
+	t.events = append(t.events, NewEstimated(uuid.New(), time.Now(), t.id, estimation))
 }
 
 func UnmarshalFromDatabase(

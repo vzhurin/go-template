@@ -4,7 +4,7 @@ info:
   title: Task tracker
   description: Task tracker
 servers:
-  - url: https://{hostname}:{port}/api
+  - url: http://{hostname}:{port}/api
     variables:
       hostname:
         default: localhost

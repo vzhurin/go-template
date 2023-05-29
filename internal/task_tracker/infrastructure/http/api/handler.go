@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/rs/cors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -14,6 +15,7 @@ func NewHandler(server ServerInterface, logger logrus.FieldLogger) http.Handler 
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
 	router.Use(common.NewLoggingMiddleware(logger))
+	router.Use(cors.Default().Handler)
 
 	return HandlerWithOptions(server, ChiServerOptions{
 		BaseURL:    "/api",

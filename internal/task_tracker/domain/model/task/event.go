@@ -1,8 +1,9 @@
-package event
+package task
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type event struct {
