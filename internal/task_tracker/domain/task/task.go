@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+	"github.com/vzhurin/template/internal/task_tracker/domain/task/event"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,7 +25,7 @@ type Task struct {
 	assignee    Assignee
 	status      Status
 	estimation  Estimation
-	events      []Event
+	events      []event.Event
 }
 
 func NewTask(id ID, title Title, description Description) *Task {
@@ -33,7 +34,7 @@ func NewTask(id ID, title Title, description Description) *Task {
 		title:       title,
 		description: description,
 		status:      Unscheduled,
-		events:      []Event{NewCreated(uuid.New(), time.Now(), id, title, description)},
+		events:      []event.Event{event.NewCreated(uuid.New(), time.Now(), id.uuid, title.title, description.description)},
 	}
 }
 
@@ -44,19 +45,19 @@ func (t *Task) ID() ID {
 func (t *Task) Describe(title Title, description Description) {
 	t.title = title
 	t.description = description
-	t.events = append(t.events, NewDescribed(uuid.New(), time.Now(), t.id, title, description))
+	t.events = append(t.events, event.NewDescribed(uuid.New(), time.Now(), t.id.uuid, title.title, description.description))
 }
 
 func (t *Task) Assign(assignee Assignee) {
 	t.assignee = assignee
-	t.events = append(t.events, NewAssigned(uuid.New(), time.Now(), t.id, assignee))
+	t.events = append(t.events, event.NewAssigned(uuid.New(), time.Now(), t.id.uuid, assignee.id.uuid))
 }
 
 func (t *Task) SwitchStatus(status Status) error {
 	for _, s := range statusTransitions[t.status] {
 		if s == status {
 			t.status = status
-			t.events = append(t.events, NewStatusSwitched(uuid.New(), time.Now(), t.id, status))
+			t.events = append(t.events, event.NewStatusSwitched(uuid.New(), time.Now(), t.id.uuid, status.status))
 
 			return nil
 		}
@@ -67,43 +68,25 @@ func (t *Task) SwitchStatus(status Status) error {
 
 func (t *Task) Estimate(estimation Estimation) {
 	t.estimation = estimation
-	t.events = append(t.events, NewEstimated(uuid.New(), time.Now(), t.id, estimation))
+	t.events = append(t.events, event.NewEstimated(uuid.New(), time.Now(), t.id.uuid, estimation.estimation))
 }
 
-func UnmarshalFromDatabase(
-	id string,
-	title string,
-	description string,
-	assignee string,
-	status string,
-	estimation uint64,
-) *Task {
-	i, _ := NewID(id)
-	t, _ := NewTitle(title)
-	d, _ := NewDescription(description)
-	a, _ := NewAssignee(assignee)
-	s := Status{status: status}
-	e := NewEstimation(estimation)
-
-	return &Task{
-		id:          i,
-		title:       t,
-		description: d,
-		assignee:    a,
-		status:      s,
-		estimation:  e,
-	}
+func (t *Task) Title() Title {
+	return t.title
 }
 
-func (t *Task) MarshalToDatabase() map[string]interface{} {
-	m := make(map[string]interface{})
+func (t *Task) Description() Description {
+	return t.description
+}
 
-	m["id"] = t.ID().String()
-	m["title"] = t.title.String()
-	m["description"] = t.description.String()
-	m["assignee"] = t.assignee.String()
-	m["status"] = t.status.String()
-	m["estimation"] = t.estimation.estimation
+func (t *Task) Assignee() Assignee {
+	return t.assignee
+}
 
-	return m
+func (t *Task) Status() Status {
+	return t.status
+}
+
+func (t *Task) Estimation() Estimation {
+	return t.estimation
 }

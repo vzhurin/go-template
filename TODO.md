@@ -1,5 +1,7 @@
 * DB
 * GORM
-* Docker
-* Docker compose
-* Swagger web interface
+* ~~Docker~~
+* ~~Docker compose~~
+* ~~Swagger web interface~~
+* DI
+* Another bounded context

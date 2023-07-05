@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,7 +18,7 @@ import (
 )
 
 const (
-	AppName = "template"
+	AppName = "task_tracker_api"
 )
 
 func main() {
@@ -23,8 +26,30 @@ func main() {
 	l.SetFormatter(&logrus.JSONFormatter{})
 	logger := l.WithField("app", AppName)
 
-	taskRepository := persistance.NewInMemoryTaskRepository()
-	app, cleanup := application.NewApplication(taskRepository, taskRepository, logger)
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_SSL"),
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		logger.Fatalf("failed to connect to database")
+	}
+
+	err = db.AutoMigrate(&persistance.GormTask{})
+	if err != nil {
+		logger.Fatalf("failed to migrate")
+	}
+
+	taskRepository := persistance.NewGormTaskRepository(db)
+	// TODO
+	taskFinder := persistance.NewInMemoryTaskFinder()
+	app, cleanup := application.NewApplication(taskRepository, taskFinder, logger)
 	defer cleanup()
 	server := api.NewServer(app, logger)
 	handler := api.NewHandler(server, logger)
@@ -46,9 +71,7 @@ func main() {
 	<-done
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer func() {
-		cancel()
-	}()
+	defer cancel()
 
 	if err := httpServer.Shutdown(ctx); err != nil {
 		logger.Fatalf("failed to gracefully shutdown HTTP server: %s\n", err)

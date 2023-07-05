@@ -1,4 +1,4 @@
-package task
+package event
 
 import (
 	"time"
@@ -8,11 +8,11 @@ import (
 
 type Assigned struct {
 	event
-	taskID   ID
-	assignee Assignee
+	taskID   uuid.UUID
+	assignee uuid.UUID
 }
 
-func NewAssigned(id uuid.UUID, occurredAt time.Time, taskID ID, assignee Assignee) *Assigned {
+func NewAssigned(id uuid.UUID, occurredAt time.Time, taskID uuid.UUID, assignee uuid.UUID) *Assigned {
 	return &Assigned{
 		event: event{
 			id:         id,

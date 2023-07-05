@@ -19,6 +19,7 @@ services:
       - DB_USER=task-tracker
       - DB_PASSWORD=task-tracker
       - DB_NAME=task-tracker
+      - DB_SSL=disable
     depends_on:
       - postgres
   postgres:

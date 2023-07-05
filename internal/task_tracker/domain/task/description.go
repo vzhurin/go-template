@@ -7,7 +7,7 @@ type Description struct {
 }
 
 func NewDescription(d string) (Description, error) {
-	if len(d) > 1000 {
+	if len([]rune(d)) > 1000 {
 		return Description{}, errors.New("description less than 1000")
 	}
 

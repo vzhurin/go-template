@@ -7,7 +7,7 @@ type Title struct {
 }
 
 func NewTitle(t string) (Title, error) {
-	if len(t) > 255 || t == "" {
+	if len([]rune(t)) > 255 || t == "" {
 		return Title{}, errors.New("title length must greater then 0 and less than 255")
 	}
 

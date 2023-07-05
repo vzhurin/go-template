@@ -1,4 +1,4 @@
-package task
+package event
 
 import (
 	"time"
@@ -8,11 +8,11 @@ import (
 
 type Estimated struct {
 	event
-	taskID     ID
-	estimation Estimation
+	taskID     uuid.UUID
+	estimation uint64
 }
 
-func NewEstimated(id uuid.UUID, occurredAt time.Time, taskID ID, estimation Estimation) *Estimated {
+func NewEstimated(id uuid.UUID, occurredAt time.Time, taskID uuid.UUID, estimation uint64) *Estimated {
 	return &Estimated{
 		event: event{
 			id:         id,

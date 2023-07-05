@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"github.com/vzhurin/template/internal/task_tracker/application/read_model/task"
 
 	"github.com/google/uuid"
 	"github.com/vzhurin/template/internal/common/application"
@@ -12,19 +13,15 @@ type TaskByID struct {
 }
 
 type taskByIDHandler struct {
-	readModel TaskByIDReadModel
+	finder task.Finder
 }
 
-func NewTaskByIDHandler(readModel TaskByIDReadModel) application.QueryHandler[TaskByID, *Task] {
+func NewTaskByIDHandler(finder task.Finder) application.QueryHandler[TaskByID, *task.Task] {
 	return &taskByIDHandler{
-		readModel: readModel,
+		finder: finder,
 	}
 }
 
-func (h *taskByIDHandler) Handle(ctx context.Context, query TaskByID) (*Task, error) {
-	return h.readModel.TaskByID(ctx, query.ID)
-}
-
-type TaskByIDReadModel interface {
-	TaskByID(ctx context.Context, id uuid.UUID) (*Task, error)
+func (h *taskByIDHandler) Handle(ctx context.Context, query TaskByID) (*task.Task, error) {
+	return h.finder.GetTaskByID(ctx, query.ID)
 }

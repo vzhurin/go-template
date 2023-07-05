@@ -1,4 +1,4 @@
-package task
+package event
 
 import (
 	"time"
@@ -8,12 +8,12 @@ import (
 
 type Described struct {
 	event
-	taskID      ID
-	title       Title
-	description Description
+	taskID      uuid.UUID
+	title       string
+	description string
 }
 
-func NewDescribed(id uuid.UUID, occurredAt time.Time, taskID ID, title Title, description Description) *Described {
+func NewDescribed(id uuid.UUID, occurredAt time.Time, taskID uuid.UUID, title string, description string) *Described {
 	return &Described{
 		event: event{
 			id:         id,

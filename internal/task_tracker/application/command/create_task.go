@@ -2,10 +2,9 @@ package command
 
 import (
 	"context"
-
 	"github.com/google/uuid"
 	"github.com/vzhurin/template/internal/common/application"
-	"github.com/vzhurin/template/internal/task_tracker/domain/model/task"
+	"github.com/vzhurin/template/internal/task_tracker/domain/task"
 )
 
 type CreateTask struct {
@@ -38,7 +37,7 @@ func (h *createTaskHandler) Handle(ctx context.Context, cmd CreateTask) error {
 
 	t := task.NewTask(id, title, description)
 
-	err = h.repository.Save(ctx, t)
+	_, err = h.repository.Save(ctx, t)
 	if err != nil {
 		return err
 	}

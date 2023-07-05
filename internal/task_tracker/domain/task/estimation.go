@@ -7,3 +7,7 @@ type Estimation struct {
 func NewEstimation(e uint64) Estimation {
 	return Estimation{estimation: e}
 }
+
+func (e Estimation) Uint64() uint64 {
+	return e.estimation
+}

@@ -5,7 +5,9 @@ import (
 	"github.com/vzhurin/template/internal/common/application"
 	"github.com/vzhurin/template/internal/task_tracker/application/command"
 	"github.com/vzhurin/template/internal/task_tracker/application/query"
-	"github.com/vzhurin/template/internal/task_tracker/domain/model/task"
+	// TODO get rid of rtask
+	rtask "github.com/vzhurin/template/internal/task_tracker/application/read_model/task"
+	"github.com/vzhurin/template/internal/task_tracker/domain/task"
 )
 
 type Application struct {
@@ -15,7 +17,7 @@ type Application struct {
 
 func NewApplication(
 	taskRepository task.Repository,
-	taskByIDReadModel query.TaskByIDReadModel,
+	taskFinder rtask.Finder,
 	logger logrus.FieldLogger,
 ) (*Application, func()) {
 	return &Application{
@@ -23,7 +25,7 @@ func NewApplication(
 				CreateTask: application.NewCommandLoggingDecorator[command.CreateTask](command.NewCreateTaskHandler(taskRepository), logger),
 			},
 			Queries: Queries{
-				TaskByID: application.NewQueryLoggingDecorator[query.TaskByID, *query.Task](query.NewTaskByIDHandler(taskByIDReadModel), logger),
+				TaskByID: application.NewQueryLoggingDecorator[query.TaskByID, *rtask.Task](query.NewTaskByIDHandler(taskFinder), logger),
 			},
 		},
 		func() { /* TODO add cleanup */ }
@@ -34,5 +36,5 @@ type Commands struct {
 }
 
 type Queries struct {
-	TaskByID application.QueryHandler[query.TaskByID, *query.Task]
+	TaskByID application.QueryHandler[query.TaskByID, *rtask.Task]
 }

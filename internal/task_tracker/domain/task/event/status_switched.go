@@ -1,4 +1,4 @@
-package task
+package event
 
 import (
 	"time"
@@ -8,11 +8,11 @@ import (
 
 type StatusSwitched struct {
 	event
-	taskID ID
-	status Status
+	taskID uuid.UUID
+	status string
 }
 
-func NewStatusSwitched(id uuid.UUID, occurredAt time.Time, taskID ID, status Status) *StatusSwitched {
+func NewStatusSwitched(id uuid.UUID, occurredAt time.Time, taskID uuid.UUID, status string) *StatusSwitched {
 	return &StatusSwitched{
 		event: event{
 			id:         id,
